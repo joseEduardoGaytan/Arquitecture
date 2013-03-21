@@ -14,8 +14,7 @@ package mx.uamcimat.a1.sistemaa;
 * 
 * 1) Obtiene los datos desde el FeetToMeterFilter
 * 2) Ya con los datos con las conversiones se dispone a construir una cadena, para estructurar la información
-* 3) Una vez la información a sido estructurada se abre un archivo y se almacena la cadena.
-* 
+* 3) Una vez la información a sido estructurada se abre un archivo y se almacena la cadena. 
 *
 ******************************************************************************************************************/
 
@@ -53,12 +52,12 @@ public class SinkFileFilter extends FilterFramework {
 		double temperature;				//Almacena la temperatura en grados Celsius
 		double altitude = 0;			//Almacena la altitud en metros, se inicializa pues el id 4 es el que determina cuando se debe hacer un salto de línea
 		
-		DecimalFormat formatoTemperatura = new DecimalFormat("###.#####"); //Para el formato de la temperatura TTT.ttttt
+		DecimalFormat formatoTemperatura = new DecimalFormat("###.#####"); 	//Para el formato de la temperatura TTT.ttttt
 		DecimalFormat formatoAltitud = new DecimalFormat("######.#####");	// Para el formato para la altitud AAAAAA.aaaaa
 		
-		StringBuffer cadena = new StringBuffer();	//Se utiliza un StringBuffer pues es eficiente con multiples threads y para concatenar strings y dar un formato apropiado a la salida.
+		StringBuffer cadena = new StringBuffer();							//Se utiliza un StringBuffer pues es eficiente con multiples threads y para concatenar strings y dar un formato apropiado a la salida.
 		
-		FileWriter archivo;				//El archivo de salida, aquí solamente se declara como FileWriter
+		FileWriter archivo;													//El archivo de salida, aquí solamente se declara como FileWriter
 
 		/*************************************************************
 		*	Primero le anunciamos al mundo que estamos vivos
