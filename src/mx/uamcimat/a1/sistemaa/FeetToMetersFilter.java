@@ -103,10 +103,10 @@ public void run(){
 				if ( id == 0 || id == 4 )
 				{
 					
-					sendIDToOutput(id, IdLength, databyte, this); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendIDToOutput(id, IdLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;
 					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendMeasurementToOutput(measurement, MeasurementLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += MeasurementLength;
 															
 					
@@ -118,10 +118,10 @@ public void run(){
 					meters = feets / 3.2808;						//meters para guardar la conversión
 					measurement = Double.doubleToLongBits(meters);	//Para tratarlo como long
 					
-					sendIDToOutput(id, IdLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendIDToOutput(id, IdLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;
 					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendMeasurementToOutput(measurement, MeasurementLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += MeasurementLength;
 															
 					

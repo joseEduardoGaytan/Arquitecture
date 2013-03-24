@@ -319,14 +319,14 @@ public class FilterFramework extends Thread
 	 * @param filtro
 	 */
 	
-	public void sendIDToOutput(int id, int IdLength, byte databyte, FilterFramework filtro)
+	public void sendIDToOutput(int id, int IdLength, byte databyte)
 	{
 		
 		for(int i = IdLength-1 ; i >= 0; i--){	
 		    
 		    databyte = (byte)(id >>> (8*i));		//para convertir a byte byte por byte contenido en el long en incrementos de 8 measurement >>> 0, 8, 16, 24, 32, 40, 48, 56
 		   
-		    filtro.WriteFilterOutputPort(databyte);			
+		    WriteFilterOutputPort(databyte);			
 
 		}//for
 		
@@ -342,14 +342,14 @@ public class FilterFramework extends Thread
 	 * @param filtro
 	 */
 	
-	public void sendMeasurementToOutput(long measurement, int MeasurementLength, byte databyte, FilterFramework filtro)
+	public void sendMeasurementToOutput(long measurement, int MeasurementLength, byte databyte)
 	{
 		
 		for(int i = MeasurementLength-1; i >= 0  ; i--){
 		    
 		    databyte = (byte)(measurement >>> (8*i));		//para convertir a byte byte por byte contenido en el long en incrementos de 8 measurement >>> 0, 8, 16, 24, 32, 40, 48, 56
 		    							
-			filtro.WriteFilterOutputPort(databyte);
+			WriteFilterOutputPort(databyte);
 
 		}//for
 		

@@ -104,10 +104,10 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 								
 				if ( id ==0 || id == 2)
 				{
-					sendIDToOutput(id, IdLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendIDToOutput(id, IdLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;						//Los bytes escritos es igual a la longitud del ID
 					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendMeasurementToOutput(measurement, MeasurementLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += MeasurementLength;				//Los bytes escritos es igual a la longitud de Measurement
 				}
 				
@@ -121,10 +121,10 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 					celsius = (temperature - 32) * (5.0 / 9);			//Celsius para guardar la conversión, se utiliza el 5.0 pues sino la operación se redondea a entero
 					measurement = Double.doubleToLongBits(celsius);		//Para tratarlo como long
 					
-					sendIDToOutput(id, IdLength, databyte, this);		//Se envían los datos al puert de salida. Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendIDToOutput(id, IdLength, databyte);		//Se envían los datos al puert de salida. Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;
 					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					sendMeasurementToOutput(measurement, MeasurementLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += MeasurementLength;
 						
 					

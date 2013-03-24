@@ -55,18 +55,24 @@ public class SinkFileFilter extends FilterFramework {
 		DecimalFormat formatoTemperatura = new DecimalFormat("###.#####"); 	//Para el formato de la temperatura TTT.ttttt
 		DecimalFormat formatoAltitud = new DecimalFormat("######.#####");	// Para el formato para la altitud AAAAAA.aaaaa
 		
-		StringBuffer cadena = new StringBuffer();							//Se utiliza un StringBuffer pues es eficiente con multiples threads y para concatenar strings y dar un formato apropiado a la salida.
-		
-		FileWriter archivo;													//El archivo de salida, aquí solamente se declara como FileWriter
+		FileWriter archivo = null;							//El archivo de salida, aquí solamente se declara como FileWriter
 
 		/*************************************************************
 		*	Primero le anunciamos al mundo que estamos vivos
 		**************************************************************/
 
-		System.out.print( "\n" + this.getName() + "::Sink File Reading ");
+		System.out.print( "\n" + this.getName() + "::Sink File Reading ");		
+				
+		try {
+			archivo = new FileWriter("OutputA.txt");
+			
+			archivo.write("Tiempo\t\t\t\tTemperatura(C)\t\tAltitud(M)\r\n"); //Se empieza el encabezado del frame
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}					
 		
-		cadena.append("Tiempo\t\t\t\tTemperatura(C)\t\tAltitud(M)\r\n");	//Se empieza el encabezado del frame
-
 		while (true)
 		{
 			try
@@ -137,7 +143,8 @@ public class SinkFileFilter extends FilterFramework {
 				if ( id == 0 )
 				{
 					TimeStamp.setTimeInMillis(measurement);
-					cadena.append(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
+					
+					archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
 
 				} // if
 
@@ -169,8 +176,8 @@ public class SinkFileFilter extends FilterFramework {
 				if ( id == 4 )
 				{
 					temperature = Double.longBitsToDouble(measurement);
-					
-					cadena.append(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
+										 
+					archivo.write(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
 				} // if
 			
 			} // try
@@ -182,7 +189,7 @@ public class SinkFileFilter extends FilterFramework {
 			 *  son cerrados y un mensaje es escrito permitiendo al usuario saber que sucede.
 			 ********************************************************************************/
 
-			catch (EndOfStreamException e)
+			catch (EndOfStreamException | IOException e)
 			{
 				ClosePorts();
 				System.out.print( "\n" + this.getName() + "::Sink Exiting; bytes read: " + bytesread );
@@ -193,9 +200,7 @@ public class SinkFileFilter extends FilterFramework {
 		} // while
 		
 		try{
-			archivo = new FileWriter("OutputA.txt");
 			
-			archivo.write(cadena.toString());
 			archivo.close();
 			
 		}catch(IOException e){
