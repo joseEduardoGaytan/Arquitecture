@@ -42,13 +42,21 @@ package mx.uamcimat.a1.sistemaa;
 ******************************************************************************************************************/
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class FilterFramework extends Thread
 {
 	// Define filter input and output ports
+	/*
+	 * Cambio se cambio el puerto de estrada y salida  por un HashMap que hacepta como 
+	 * key un FilterFramework y que acepte como value un PiPipedInputStream
+	 */
 
+	//protected HashMap<FilterFramework, PipedInputStream> InputReadPort = new HashMap<FilterFramework, PipedInputStream>();
 	private PipedInputStream InputReadPort = new PipedInputStream();
-	private PipedOutputStream OutputWritePort = new PipedOutputStream();
+	protected HashMap<FilterFramework, PipedOutputStream> OutputWritePort = new HashMap<FilterFramework, PipedOutputStream>();
+	//private PipedOutputStream OutputWritePort = new PipedOutputStream();
 
 	// The following reference to a filter is used because java pipes are able to reliably
 	// detect broken pipes on the input port of the filter. This variable will point to
@@ -97,11 +105,23 @@ public class FilterFramework extends Thread
 
 	public void Connect( FilterFramework Filter )
 	{
+		
 		try
 		{
 			// Connect this filter's input to the upstream pipe's output stream
-
-			InputReadPort.connect( Filter.OutputWritePort );
+			/*
+			 * se creo un PipedInputStream Local para realizar la conexion entre los filtrol
+			 * y mapearlo al filtro 
+			 * se creo un PipedOutputStream Local para realizar la conexion entre los filtros
+			 * y maperarlo al fitro
+			 */
+			//PipedInputStream InputReadPortLocal = new PipedInputStream();
+			PipedOutputStream OutputWritePortLocal = new PipedOutputStream();
+			Filter.OutputWritePort.put(this, OutputWritePortLocal);
+			//InputReadPortLocal.connect( Filter.OutputWritePort.get(this) );
+			//InputReadPort.put(this, InputReadPortLocal);
+			InputReadPort.connect( Filter.OutputWritePort.get(this));
+			//InputReadPort.connect( Filter.OutputWritePort );
 			InputFilter = Filter;
 
 		} // try
@@ -146,6 +166,11 @@ public class FilterFramework extends Thread
 
 		try
 		{
+			/*
+			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
+			 * el Filter 
+			 */
+			//while (InputReadPort.get(this).available()==0 )
 			while (InputReadPort.available()==0 )
 			{
 				if (EndOfInputStream())
@@ -179,6 +204,11 @@ public class FilterFramework extends Thread
 
 		try
 		{
+			/*
+			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
+			 * el Filter 
+			 */
+			//datum = (byte)InputReadPort.get(this).read();
 			datum = (byte)InputReadPort.read();
 			return datum;
 
@@ -206,13 +236,19 @@ public class FilterFramework extends Thread
 	* Exceptions: IOException
 	*
 	****************************************************************************/
-
-	protected void WriteFilterOutputPort(byte datum)
+	/*
+	 * se Modifica el metodo para obtener el filtro en el cual se va a escribir
+	 */
+	protected void WriteFilterOutputPort(byte datum, FilterFramework Filter)
 	{
 		try
 		{
-            OutputWritePort.write((int) datum );
-		   	OutputWritePort.flush();
+			/*
+			 * se modificaron las 2 siguientes lineas   para obtener el puerto al que esta conectado 
+			 * el Filter 
+			 */
+            OutputWritePort.get(Filter).write((int) datum );
+		   	OutputWritePort.get(Filter).flush();
 
 		} // try
 
@@ -274,9 +310,22 @@ public class FilterFramework extends Thread
 	protected void ClosePorts()
 	{
 		try
-		{
+		{	
+			/*
+			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
+			 * el Filter 
+			 */
+			//InputReadPort.get(this).close();
 			InputReadPort.close();
-			OutputWritePort.close();
+			/*
+			 * se modificaron las 2siguientes lineas   para obtener el puerto al que esta conectado 
+			 * el Filter 
+			 */
+			for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+				OutputWritePort.get(entry.getKey()).close();
+			}
+				
+			
 
 		}
 		catch( Exception Error )
@@ -326,7 +375,7 @@ public class FilterFramework extends Thread
 		    
 		    databyte = (byte)(id >>> (8*i));		//para convertir a byte byte por byte contenido en el long en incrementos de 8 measurement >>> 0, 8, 16, 24, 32, 40, 48, 56
 		   
-		    filtro.WriteFilterOutputPort(databyte);			
+		    WriteFilterOutputPort(databyte,filtro);			
 
 		}//for
 		
@@ -349,7 +398,7 @@ public class FilterFramework extends Thread
 		    
 		    databyte = (byte)(measurement >>> (8*i));		//para convertir a byte byte por byte contenido en el long en incrementos de 8 measurement >>> 0, 8, 16, 24, 32, 40, 48, 56
 		    							
-			filtro.WriteFilterOutputPort(databyte);
+			WriteFilterOutputPort(databyte,filtro);
 
 		}//for
 		

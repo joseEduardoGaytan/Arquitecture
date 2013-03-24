@@ -25,14 +25,15 @@ public class Plumber {
 		FarenheitToCelsiusFilter tempFilter = new FarenheitToCelsiusFilter();
 		FeetToMetersFilter altFilter = new FeetToMetersFilter();
 		SinkFileFilter sinkFilter = new SinkFileFilter();
+		SinkFileFilter2 sinkFilter2 = new SinkFileFilter2();
 
 		/****************************************************************************
 		* Aqui conectamos los filtros empezando con el filtro pozo (filter3) el cual
 		* conectamos al filter2 que es el filtro del medio. Posteriormente conectamos filter2
 		* al filtro fuente (filter1).
 		****************************************************************************/
-
-		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
+		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink2 a la salida del Filtro de altitud
+		sinkFilter2.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
 		altFilter.Connect(tempFilter); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
 		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
 				
@@ -43,6 +44,7 @@ public class Plumber {
 		filter1.start();		
 		tempFilter.start();
 		altFilter.start();
+		sinkFilter2.start();
 		sinkFilter.start();
 
 	}

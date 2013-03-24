@@ -18,6 +18,10 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.PipedOutputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class SourceFilter extends FilterFramework
 {
@@ -43,12 +47,16 @@ public class SourceFilter extends FilterFramework
 			 *  Aqui leemos datos del archivo y los enviamos al puerto de salida del filtro
 			 *  un byte a la vez. El ciclo termina cuando encuentra un EOFExecption.
 			 ***********************************************************************************/
-
+			/*
+			 * se creo un For each para recorer los filtros conectados y obtener los puertos de cada uno
+			 */
 			while(true)
 			{
 				databyte = in.readByte();
 				bytesread++;
-				WriteFilterOutputPort(databyte);
+				for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+					WriteFilterOutputPort(databyte,entry.getKey());
+				}
 				byteswritten++;
 
 			} // while

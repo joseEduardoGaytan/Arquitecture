@@ -1,5 +1,8 @@
 package mx.uamcimat.a1.sistemaa;
 
+import java.io.PipedOutputStream;
+import java.util.Map.Entry;
+
 /******************************************************************************************************************
 * File:FarenheitToCelsiusFilter.java
 * Project: Assignment 1, Sistem A
@@ -104,11 +107,15 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 								
 				if ( id ==0 || id == 2)
 				{
-					sendIDToOutput(id, IdLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					byteswritten += IdLength;						//Los bytes escritos es igual a la longitud del ID
-					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					byteswritten += MeasurementLength;				//Los bytes escritos es igual a la longitud de Measurement
+					/*
+					 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
+					 */
+					for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+						sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
+						sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					}
+					byteswritten += IdLength;
+					byteswritten += MeasurementLength;
 				}
 				
 				/**
@@ -121,11 +128,15 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 					celsius = (temperature - 32) * (5.0 / 9);			//Celsius para guardar la conversión, se utiliza el 5.0 pues sino la operación se redondea a entero
 					measurement = Double.doubleToLongBits(celsius);		//Para tratarlo como long
 					
-					sendIDToOutput(id, IdLength, databyte, this);		//Se envían los datos al puert de salida. Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+					/*
+					 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
+					 */
+					for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+						sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
+						sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
+					}
 					byteswritten += IdLength;
-					
-					sendMeasurementToOutput(measurement, MeasurementLength, databyte, this);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					byteswritten += MeasurementLength;
+					byteswritten += MeasurementLength;;
 						
 					
 				} // if
