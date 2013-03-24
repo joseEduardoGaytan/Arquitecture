@@ -1,5 +1,6 @@
 package mx.uamcimat.a1.sistemaa;
 
+import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Map.Entry;
 
@@ -45,100 +46,105 @@ public void run(){
 		
 		while(true){
 			try{
-				
-				/***************************************************************************
-				 * Sabemos que el primer dato que entra al filtro va a ser un ID de longitud
-				 * idLength. Primero obtenemos los bytes del ID				
-				 ***************************************************************************/
-
-				id = 0;
-
-				for (i=0; i<IdLength; i++ )
-				{
-					databyte = ReadFilterInputPort();	// Aqui leemos el byte del flujo	
-
-					id = id | (databyte & 0xFF);		// Adjuntamos el byte al ID
-
-					if (i != IdLength-1)				// Si este no es el ultimo byte, se hace un corrimiento del byte que se adjunto 
-					{									// un byte a la izquierda
-						id = id << 8;					// para hacer lugar para el proximo byte que adjuntamos al id
-
+				/*
+				 * for para leer los datos de cada puerto de entrada
+				 */
+				for(Entry<FilterFramework, PipedInputStream> e :  InputReadPort.entrySet()) {
+										
+					
+					/***************************************************************************
+					 * Sabemos que el primer dato que entra al filtro va a ser un ID de longitud
+					 * idLength. Primero obtenemos los bytes del ID				
+					 ***************************************************************************/
+	
+					id = 0;
+	
+					for (i=0; i<IdLength; i++ )
+					{
+						databyte = ReadFilterInputPort(e.getKey());	// Aqui leemos el byte del flujo	
+	
+						id = id | (databyte & 0xFF);		// Adjuntamos el byte al ID
+	
+						if (i != IdLength-1)				// Si este no es el ultimo byte, se hace un corrimiento del byte que se adjunto 
+						{									// un byte a la izquierda
+							id = id << 8;					// para hacer lugar para el proximo byte que adjuntamos al id
+	
+						} // if
+	
+						bytesread++;						// Se incrementa el conteo de bytes
+	
+					} // for
+					
+					/****************************************************************************
+					 * Aqui leemos mediciones. Todos los datos de medicion se leen como un flujo de bytes
+					 * y se almacenan como un valor long. Esto nos permite hacer manipulaciones a nivel bit
+					 * que son necesarias para convertir el flujo de bytes en varias palabras da datos. Notese que
+					 * las manipulaciones de bits no estan permitidas en tipos de punto flotante en java.
+					 * Si el id = 0, entonces este es un valor de tiempo y por ello es un valor long - no
+					 * hay problema. Sin embargo, si el id es algo distinto a cero, entonces los bits
+					 * en el valor long son realmente de tipo double y necesitamos convertir el valor usando
+					 * Double.longBitsToDouble(long val) para hacer la conversion, lo cual se muestra
+					 * abajo.
+					 *****************************************************************************/
+	
+					measurement = 0;
+	
+					for (i=0; i<MeasurementLength; i++ )
+					{
+						databyte = ReadFilterInputPort(e.getKey());
+						measurement = measurement | (databyte & 0xFF);	// Adjuntamos el byte a la medicion...
+	
+						if (i != MeasurementLength-1)					// Si este no es el ultimo byte, recorremos el byte
+						{												// previamente adjuntado a la izquierda por un byte
+							measurement = measurement << 8;				// para hacer lugar para el proximo byte que adjuntamos a la
+																		// medicion
+						} // if
+	
+						bytesread++;									// Incrementamos el conteo de bytes
+	
 					} // if
-
-					bytesread++;						// Se incrementa el conteo de bytes
-
-				} // for
-				
-				/****************************************************************************
-				 * Aqui leemos mediciones. Todos los datos de medicion se leen como un flujo de bytes
-				 * y se almacenan como un valor long. Esto nos permite hacer manipulaciones a nivel bit
-				 * que son necesarias para convertir el flujo de bytes en varias palabras da datos. Notese que
-				 * las manipulaciones de bits no estan permitidas en tipos de punto flotante en java.
-				 * Si el id = 0, entonces este es un valor de tiempo y por ello es un valor long - no
-				 * hay problema. Sin embargo, si el id es algo distinto a cero, entonces los bits
-				 * en el valor long son realmente de tipo double y necesitamos convertir el valor usando
-				 * Double.longBitsToDouble(long val) para hacer la conversion, lo cual se muestra
-				 * abajo.
-				 *****************************************************************************/
-
-				measurement = 0;
-
-				for (i=0; i<MeasurementLength; i++ )
-				{
-					databyte = ReadFilterInputPort();
-					measurement = measurement | (databyte & 0xFF);	// Adjuntamos el byte a la medicion...
-
-					if (i != MeasurementLength-1)					// Si este no es el ultimo byte, recorremos el byte
-					{												// previamente adjuntado a la izquierda por un byte
-						measurement = measurement << 8;				// para hacer lugar para el proximo byte que adjuntamos a la
-																	// medicion
+					
+					/**********************************************************************************
+					 * Se compara cuando el id = 0 o 4, si no se hace la comparación 
+					 * con el fin de pasarlo a la salida del siguiente filtro. 
+					 ***********************************************************************************/			
+					
+					if ( id == 0 || id == 4 )
+					{
+						
+						/*
+						 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
+						 */
+						for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+							sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
+							sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+						
+						}
+						byteswritten += IdLength;
+						byteswritten += MeasurementLength;
+																
+						
 					} // if
-
-					bytesread++;									// Incrementamos el conteo de bytes
-
-				} // if
-				
-				/**********************************************************************************
-				 * Se compara cuando el id = 0 o 4, si no se hace la comparación 
-				 * con el fin de pasarlo a la salida del siguiente filtro. 
-				 ***********************************************************************************/			
-				
-				if ( id == 0 || id == 4 )
-				{
 					
-					/*
-					 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
-					 */
-					for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
-						sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
-						sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					
-					}
-					byteswritten += IdLength;
-					byteswritten += MeasurementLength;
-															
-					
-				} // if
-				
-				if ( id == 2 )
-				{
-					feets = Double.longBitsToDouble(measurement); 	//Almacenar el valor de measurment a double
-					meters = feets / 3.2808;						//meters para guardar la conversión
-					measurement = Double.doubleToLongBits(meters);	//Para tratarlo como long
-					/*
-					 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
-					 */
-					for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
-						sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
-						sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					
-					}
-					byteswritten += IdLength;
-					byteswritten += MeasurementLength;
-															
-					
-				} // if
-				
+					if ( id == 2 )
+					{
+						feets = Double.longBitsToDouble(measurement); 	//Almacenar el valor de measurment a double
+						meters = feets / 3.2808;						//meters para guardar la conversión
+						measurement = Double.doubleToLongBits(meters);	//Para tratarlo como long
+						/*
+						 * se agrega un Foreach  para leer todos puertos de salida e enviar los datos  cada filtro correspondiente
+						 */
+						for(Entry<FilterFramework, PipedOutputStream> entry :  OutputWritePort.entrySet()) {
+							sendIDToOutput(id, IdLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort	
+							sendMeasurementToOutput(measurement, MeasurementLength, databyte, entry.getKey()); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+						
+						}
+						byteswritten += IdLength;
+						byteswritten += MeasurementLength;
+																
+						
+					} // if
+				}//for
 			}catch(EndOfStreamException e){
 				ClosePorts();
 				System.out.print( "\n" + this.getName() + "::Conversion of Altitude Exiting; bytes read: " + bytesread +"; bytes written: " + byteswritten );

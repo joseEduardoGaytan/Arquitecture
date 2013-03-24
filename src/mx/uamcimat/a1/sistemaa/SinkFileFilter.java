@@ -21,6 +21,7 @@ package mx.uamcimat.a1.sistemaa;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map.Entry;
 import java.io.*;
 import java.text.*;
 
@@ -71,108 +72,114 @@ public class SinkFileFilter extends FilterFramework {
 		{
 			try
 			{
-				/***************************************************************************
-				 * Sabemos que el primer dato que entra al filtro va a ser un ID de longitud
-				 * idLength. Primero obtenemos los bytes del ID				
-				 ***************************************************************************/
-
-				id = 0;
-
-				for (i=0; i<IdLength; i++ )
-				{
-					databyte = ReadFilterInputPort();	// Aqui leemos el byte del flujo	
-
-					id = id | (databyte & 0xFF);		// Adjuntamos el byte al ID
-
-					if (i != IdLength-1)				// Si este no es el ultimo byte, se hace un corrimiento del byte que se adjunto 
-					{									// un byte a la izquierda
-						id = id << 8;					// para hacer lugar para el proximo byte que adjuntamos al id
-
-					} // if
-
-					bytesread++;						// Se incrementa el conteo de bytes
-
-				} // for
-
-				/****************************************************************************
-				 * Aqui leemos mediciones. Todos los datos de medicion se leen como un flujo de bytes
-				 * y se almacenan como un valor long. Esto nos permite hacer manipulaciones a nivel bit
-				 * que son necesarias para convertir el flujo de bytes en varias palabras da datos. Notese que
-				 * las manipulaciones de bits no estan permitidas en tipos de punto flotante en java.
-				 * Si el id = 0, entonces este es un valor de tiempo y por ello es un valor long - no
-				 * hay problema. Sin embargo, si el id es algo distinto a cero, entonces los bits
-				 * en el valor long son realmente de tipo double y necesitamos convertir el valor usando
-				 * Double.longBitsToDouble(long val) para hacer la conversion, lo cual se muestra
-				 * abajo.
-				 *****************************************************************************/
-
-				measurement = 0;
-
-				for (i=0; i<MeasurementLength; i++ )
-				{
-					databyte = ReadFilterInputPort();
-					measurement = measurement | (databyte & 0xFF);	// Adjuntamos el byte a la medicion...
-
-					if (i != MeasurementLength-1)					// Si este no es el ultimo byte, recorremos el byte
-					{												// previamente adjuntado a la izquierda por un byte
-						measurement = measurement << 8;				// para hacer lugar para el proximo byte que adjuntamos a la
-																	// medicion
-					} // if
-
-					bytesread++;									// Incrementamos el conteo de bytes
-
-				} // if
-
-				/****************************************************************************
-				 * Aqui buscamos un ID de 0 que indica que esta es una medicion de tiempo.
-				 * Cada marco (frame) empieza con un ID de 0 seguido de una estampa de tiempo
-				 * que correlaciona con el tiempo en que se registro la medicion. El tiempo es almacenado
-				 * en milisegundos desde Epoch. Esto nos permite usar la clase calendar de Java para
-				 * recuperar el tiempo y tambien usar clases de formateo de texto para dar formato
-				 * a la salida en un formato legible para los humanos. Esto provee gran flexibilidad
-				 * en terminos de lidiar con el tiempo de forma aritmetica para propositos de 
-				 * despliegue de cadenas. Esto se ilustra abajo.
-				 ****************************************************************************/
-
-				if ( id == 0 )
-				{
-					TimeStamp.setTimeInMillis(measurement);
-					cadena.append(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
-
-				} // if
-
-				/****************************************************************************
-				 * Aqui tomamos una medicion (ID = 2 en este caso), pero se puede tomar cualquier
-				 * medicion que se quiera. Todas las mediciones en el flujo son recuperadas
-				 * por esta clase. Notese que todas las mediciones son de tipo double.
-				 * Esto ilustra como convertir los bytes leidos del flujo en un tipo double. 
-				 * Esto es bastante simple usando Double.longBitsToDouble(long value). Se almacena 
-				 * el valor en la variable altitude con el fin de utilizarlo posteriormente.
-				 ****************************************************************************/
-
-				if (id == 2)
-				{
-					altitude = Double.longBitsToDouble(measurement);
-				}
-				
-				/****************************************************************************
-				 * Aqui tomamos una medicion (ID = 4 en este caso), pero se puede tomar cualquier
-				 * medicion que se quiera. Todas las mediciones en el flujo son recuperadas
-				 * por esta clase. Notese que todas las mediciones son de tipo double.
-				 * Esto ilustra como convertir los bytes leidos del flujo en un tipo double. 
-				 * Esto es bastante simple usando Double.longBitsToDouble(long value). Se almacena 
-				 * el valor en la variable temperature. El ID 4 representa que es el último dato
-				 * que estamos esperando para que se produzca un salto de línea y se presenten de
-				 * manera correcta los datos.
-				 ****************************************************************************/
-				
-				if ( id == 4 )
-				{
-					temperature = Double.longBitsToDouble(measurement);
+				/*
+				 * for para leer los datos de cada puerto de entrada
+				 */
+				for(Entry<FilterFramework, PipedInputStream> e :  InputReadPort.entrySet()) {
+										
 					
-					cadena.append(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
-				} // if
-			
+					/***************************************************************************
+					 * Sabemos que el primer dato que entra al filtro va a ser un ID de longitud
+					 * idLength. Primero obtenemos los bytes del ID				
+					 ***************************************************************************/
+	
+					id = 0;
+	
+					for (i=0; i<IdLength; i++ )
+					{
+						databyte = ReadFilterInputPort(e.getKey());	// Aqui leemos el byte del flujo	
+	
+						id = id | (databyte & 0xFF);		// Adjuntamos el byte al ID
+	
+						if (i != IdLength-1)				// Si este no es el ultimo byte, se hace un corrimiento del byte que se adjunto 
+						{									// un byte a la izquierda
+							id = id << 8;					// para hacer lugar para el proximo byte que adjuntamos al id
+	
+						} // if
+	
+						bytesread++;						// Se incrementa el conteo de bytes
+	
+					} // for
+	
+					/****************************************************************************
+					 * Aqui leemos mediciones. Todos los datos de medicion se leen como un flujo de bytes
+					 * y se almacenan como un valor long. Esto nos permite hacer manipulaciones a nivel bit
+					 * que son necesarias para convertir el flujo de bytes en varias palabras da datos. Notese que
+					 * las manipulaciones de bits no estan permitidas en tipos de punto flotante en java.
+					 * Si el id = 0, entonces este es un valor de tiempo y por ello es un valor long - no
+					 * hay problema. Sin embargo, si el id es algo distinto a cero, entonces los bits
+					 * en el valor long son realmente de tipo double y necesitamos convertir el valor usando
+					 * Double.longBitsToDouble(long val) para hacer la conversion, lo cual se muestra
+					 * abajo.
+					 *****************************************************************************/
+	
+					measurement = 0;
+	
+					for (i=0; i<MeasurementLength; i++ )
+					{
+						databyte = ReadFilterInputPort(e.getKey());
+						measurement = measurement | (databyte & 0xFF);	// Adjuntamos el byte a la medicion...
+	
+						if (i != MeasurementLength-1)					// Si este no es el ultimo byte, recorremos el byte
+						{												// previamente adjuntado a la izquierda por un byte
+							measurement = measurement << 8;				// para hacer lugar para el proximo byte que adjuntamos a la
+																		// medicion
+						} // if
+	
+						bytesread++;									// Incrementamos el conteo de bytes
+	
+					} // if
+	
+					/****************************************************************************
+					 * Aqui buscamos un ID de 0 que indica que esta es una medicion de tiempo.
+					 * Cada marco (frame) empieza con un ID de 0 seguido de una estampa de tiempo
+					 * que correlaciona con el tiempo en que se registro la medicion. El tiempo es almacenado
+					 * en milisegundos desde Epoch. Esto nos permite usar la clase calendar de Java para
+					 * recuperar el tiempo y tambien usar clases de formateo de texto para dar formato
+					 * a la salida en un formato legible para los humanos. Esto provee gran flexibilidad
+					 * en terminos de lidiar con el tiempo de forma aritmetica para propositos de 
+					 * despliegue de cadenas. Esto se ilustra abajo.
+					 ****************************************************************************/
+	
+					if ( id == 0 )
+					{
+						TimeStamp.setTimeInMillis(measurement);
+						cadena.append(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
+	
+					} // if
+	
+					/****************************************************************************
+					 * Aqui tomamos una medicion (ID = 2 en este caso), pero se puede tomar cualquier
+					 * medicion que se quiera. Todas las mediciones en el flujo son recuperadas
+					 * por esta clase. Notese que todas las mediciones son de tipo double.
+					 * Esto ilustra como convertir los bytes leidos del flujo en un tipo double. 
+					 * Esto es bastante simple usando Double.longBitsToDouble(long value). Se almacena 
+					 * el valor en la variable altitude con el fin de utilizarlo posteriormente.
+					 ****************************************************************************/
+	
+					if (id == 2)
+					{
+						altitude = Double.longBitsToDouble(measurement);
+					}
+					
+					/****************************************************************************
+					 * Aqui tomamos una medicion (ID = 4 en este caso), pero se puede tomar cualquier
+					 * medicion que se quiera. Todas las mediciones en el flujo son recuperadas
+					 * por esta clase. Notese que todas las mediciones son de tipo double.
+					 * Esto ilustra como convertir los bytes leidos del flujo en un tipo double. 
+					 * Esto es bastante simple usando Double.longBitsToDouble(long value). Se almacena 
+					 * el valor en la variable temperature. El ID 4 representa que es el último dato
+					 * que estamos esperando para que se produzca un salto de línea y se presenten de
+					 * manera correcta los datos.
+					 ****************************************************************************/
+					
+					if ( id == 4 )
+					{
+						temperature = Double.longBitsToDouble(measurement);
+						
+						cadena.append(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
+					} // if
+				}//for
 			} // try
 
 

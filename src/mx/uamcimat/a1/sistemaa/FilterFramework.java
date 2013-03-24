@@ -49,12 +49,12 @@ public class FilterFramework extends Thread
 {
 	// Define filter input and output ports
 	/*
-	 * Cambio se cambio el puerto de estrada y salida  por un HashMap que hacepta como 
-	 * key un FilterFramework y que acepte como value un PiPipedInputStream
+	 * Cambio se cambio el puerto de estrada y salida  por un HashMap que acepta como 
+	 * key un FilterFramework y que acepte como value un PipedInputStream o PipedOutputStream
 	 */
 
-	//protected HashMap<FilterFramework, PipedInputStream> InputReadPort = new HashMap<FilterFramework, PipedInputStream>();
-	private PipedInputStream InputReadPort = new PipedInputStream();
+	protected HashMap<FilterFramework, PipedInputStream> InputReadPort = new HashMap<FilterFramework, PipedInputStream>();
+	//private PipedInputStream InputReadPort = new PipedInputStream();
 	protected HashMap<FilterFramework, PipedOutputStream> OutputWritePort = new HashMap<FilterFramework, PipedOutputStream>();
 	//private PipedOutputStream OutputWritePort = new PipedOutputStream();
 
@@ -112,17 +112,17 @@ public class FilterFramework extends Thread
 			/*
 			 * se creo un PipedInputStream Local para realizar la conexion entre los filtrol
 			 * y mapearlo al filtro 
-			 * se creo un PipedOutputStream Local para realizar la conexion entre los filtros
-			 * y maperarlo al fitro
 			 */
-			//PipedInputStream InputReadPortLocal = new PipedInputStream();
+			PipedInputStream InputReadPortLocal = new PipedInputStream();
+			InputReadPort.put(Filter, InputReadPortLocal);
+			InputFilter = Filter;
+			/* se creo un PipedOutputStream Local para realizar la conexion entre los filtros
+			 * y maperarlo al fitro
+			 */			
 			PipedOutputStream OutputWritePortLocal = new PipedOutputStream();
 			Filter.OutputWritePort.put(this, OutputWritePortLocal);
-			//InputReadPortLocal.connect( Filter.OutputWritePort.get(this) );
-			//InputReadPort.put(this, InputReadPortLocal);
-			InputReadPort.connect( Filter.OutputWritePort.get(this));
-			//InputReadPort.connect( Filter.OutputWritePort );
-			InputFilter = Filter;
+			InputReadPortLocal.connect( Filter.OutputWritePort.get(this));
+;
 
 		} // try
 
@@ -146,7 +146,7 @@ public class FilterFramework extends Thread
 	*
 	****************************************************************************/
 
-	protected byte ReadFilterInputPort() throws EndOfStreamException
+	protected byte ReadFilterInputPort(FilterFramework Filter ) throws EndOfStreamException
 	{
 		byte datum = 0;
 
@@ -170,10 +170,10 @@ public class FilterFramework extends Thread
 			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
 			 * el Filter 
 			 */
-			//while (InputReadPort.get(this).available()==0 )
-			while (InputReadPort.available()==0 )
+			while (InputReadPort.get(Filter).available()==0 )
+			//while (InputReadPort.available()==0 )
 			{
-				if (EndOfInputStream())
+				if (EndOfInputStream(Filter))
 				{
 					throw new EndOfStreamException("End of input stream reached");
 
@@ -208,8 +208,8 @@ public class FilterFramework extends Thread
 			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
 			 * el Filter 
 			 */
-			//datum = (byte)InputReadPort.get(this).read();
-			datum = (byte)InputReadPort.read();
+			datum = (byte)InputReadPort.get(Filter).read();
+			//datum = (byte)InputReadPort.read();
 			return datum;
 
 		} // try
@@ -278,10 +278,10 @@ public class FilterFramework extends Thread
 	* Exceptions: none
 	*
 	****************************************************************************/
-
-	private boolean EndOfInputStream()
+/////checarrrrrrrrrrrrrrrrrrr
+	private boolean EndOfInputStream(FilterFramework Filter)
 	{
-		if (InputFilter.isAlive())
+		if (Filter.isAlive())
 		{
 			return false;
 
@@ -315,8 +315,9 @@ public class FilterFramework extends Thread
 			 * se modifico la la siguiente  para obtener el puerto al que esta conectado 
 			 * el Filter 
 			 */
-			//InputReadPort.get(this).close();
-			InputReadPort.close();
+			for(Entry<FilterFramework, PipedInputStream> entry :  InputReadPort.entrySet()) {
+				InputReadPort.get(entry.getKey()).close();
+			}
 			/*
 			 * se modificaron las 2siguientes lineas   para obtener el puerto al que esta conectado 
 			 * el Filter 
