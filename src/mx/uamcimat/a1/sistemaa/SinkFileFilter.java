@@ -176,7 +176,7 @@ public class SinkFileFilter extends FilterFramework {
 				if ( id == 4 )
 				{
 					temperature = Double.longBitsToDouble(measurement);
-										 
+					
 					archivo.write(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
 				} // if
 			

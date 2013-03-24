@@ -250,7 +250,7 @@ public class FilterFramework extends Thread
 			return false;
 
 		} else {
-
+			
 			return true;
 
 		} // if

@@ -107,8 +107,7 @@ public void run(){
 					byteswritten += IdLength;
 					
 					sendMeasurementToOutput(measurement, MeasurementLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-					byteswritten += MeasurementLength;
-															
+					byteswritten += MeasurementLength;	
 					
 				} // if
 				
