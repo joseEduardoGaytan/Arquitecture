@@ -101,7 +101,8 @@ public void run(){
 				 * con el fin de pasarlo a la salida del siguiente filtro. 
 				 ***********************************************************************************/			
 				
-				if ( id == 0 )//|| id == 4 )
+				//if ( id == 0 )//|| id == 4 )
+				if ( id == 0 || id == 4 )
 				{
 					
 					sendIDToOutput(id, IdLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort

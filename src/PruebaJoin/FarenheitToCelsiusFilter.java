@@ -102,8 +102,9 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 				 * con el fin de pasarlo a la salida del siguiente filtro. Sin esta comparación 
 				 * los otros datos no son pasados al siguiente filtro.
 				 ***********************************************************************************/				
-								
-				/*if ( id ==0 ) //|| id == 2)
+						
+				//Todo este bloque comentado
+				if ( id ==0 || id == 2)
 				{
 					sendIDToOutput(id, IdLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;						//Los bytes escritos es igual a la longitud del ID
@@ -111,7 +112,7 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 					sendMeasurementToOutput(measurement, MeasurementLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += MeasurementLength;				//Los bytes escritos es igual a la longitud de Measurement
 				}
-				*/
+				
 				/**
 				 * Se hace la comparación con 4, ya que se trata del Id de la temperatura, se hace la conversión a grados Celcius
 				 */

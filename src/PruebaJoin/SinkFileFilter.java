@@ -171,7 +171,7 @@ public class SinkFileFilter extends FilterFramework {
 				{
 					temperature = Double.longBitsToDouble(measurement);
 					
-					cadena.append("\t\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
+					cadena.append(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
 				} // if
 			
 			} // try
@@ -194,7 +194,7 @@ public class SinkFileFilter extends FilterFramework {
 		} // while
 		
 		try{
-			archivo = new FileWriter("PruebaJoinAlt.txt");
+			archivo = new FileWriter("PruebaJoinForkAlt.txt");
 			
 			archivo.write(cadena.toString());
 			archivo.close();

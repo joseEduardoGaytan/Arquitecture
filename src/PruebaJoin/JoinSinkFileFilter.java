@@ -73,7 +73,7 @@ public class JoinSinkFileFilter extends FilterFramework {
 		//cadena.append("Tiempo\t\t\t\tTemperatura(C)\t\tAltitud(M)\r\n");	//Se empieza el encabezado del frame
 		
 		try {
-			archivo = new FileWriter("PruebaJoinA.txt");
+			archivo = new FileWriter("PruebaJoinFinal.txt");
 			
 			archivo.write("Tiempo\t\t\t\tTemperatura(C)\t\tAltitud(M)\r\n"); //Se empieza el encabezado del frame
 			
@@ -187,6 +187,11 @@ public class JoinSinkFileFilter extends FilterFramework {
 				if ( id == 4 )
 				{
 					temperature = Double.longBitsToDouble(measurement);
+					
+					if(temperature > -8 && temperature < -7)
+					{
+						altitude = altitude;
+					}
 					
 					//cadena.append(formatoTemperatura.format(temperature)+"\t\t"+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
 					

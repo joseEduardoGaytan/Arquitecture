@@ -147,6 +147,9 @@ public class FilterFramework extends Thread
 	protected byte ReadFilterInputPort(int index) throws EndOfStreamException
 	{
 		byte datum = 0;
+		
+		PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
+		FilterFramework input = InputFilters.get(index);
 
 		/***********************************************************************
 		* Since delays are possible on upstream filters, we first wait until
@@ -165,13 +168,14 @@ public class FilterFramework extends Thread
 		try
 		{
 			
-			for(PipedInputStream input: InputReadPorts.values())
-			{
+			//for(PipedInputStream input: InputReadPorts.values())
+			//{
 				
 			//while (InputReadPort.available()==0 )
-			while(input.available() == 0)
+			//while(input.available() == 0)
+			while(InputReadPort.available() == 0)
 			{
-				if (EndOfInputStream())
+				if ( EndOfInputStream(input) )
 				{					
 					throw new EndOfStreamException("End of input stream reached");
 
@@ -180,7 +184,7 @@ public class FilterFramework extends Thread
 				sleep(250);
 
 			} // while
-			}
+			//}
 			
 
 		} // try
@@ -204,7 +208,7 @@ public class FilterFramework extends Thread
 
 		try
 		{
-			PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
+			//PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
 			
 			datum = (byte)InputReadPort.read();			
 			return datum;			
@@ -274,15 +278,17 @@ public class FilterFramework extends Thread
 	*
 	****************************************************************************/
 
-	private boolean EndOfInputStream()
+	private boolean EndOfInputStream(FilterFramework InputFilter)
 	{
-		for(FilterFramework InputFilter: InputFilters)
-		{
+		//boolean alive = true; 
+		
+		//for(FilterFramework InputFilter: InputFilters)
+		//{
 		if (InputFilter.isAlive())
 		{
 			return false;
 		}			
-		}
+		//}
 		return true;
 
 	} // EndOfInputStream

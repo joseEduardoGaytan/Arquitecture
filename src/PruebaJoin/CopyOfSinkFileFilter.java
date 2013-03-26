@@ -194,7 +194,7 @@ public class CopyOfSinkFileFilter extends FilterFramework {
 		} // while
 		
 		try{
-			archivo = new FileWriter("PruebaJoinTemp.txt");
+			archivo = new FileWriter("PruebaJoinForkTemp.txt");
 			
 			archivo.write(cadena.toString());
 			archivo.close();

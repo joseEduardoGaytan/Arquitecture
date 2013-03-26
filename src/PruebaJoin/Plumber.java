@@ -35,15 +35,31 @@ public class Plumber {
 		* al filtro fuente (filter1).
 		****************************************************************************/
 
+		//Para el join
+		
 		joinFilter.Connect(altFilter);
 		joinFilter.Connect(tempFilter);
 		altFilter.Connect(filter1);
-		tempFilter.Connect(filter1);		
+		tempFilter.Connect(filter1);	
+		
+		//Para el sequential
+		/*sinkFilter.Connect(tempFilter);
+		tempFilter.Connect(altFilter);
+		altFilter.Connect(filter1);*/
+		
+		//Para el Fork
+		/*sinkFilter2.Connect(tempFilter);
+		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
+		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
+		altFilter.Connect(filter1);*/ //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
+		
 		
 		/*sinkFilter2.Connect(tempFilter);
 		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
 		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
-		altFilter.Connect(filter1); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
+		altFilter.Connect(filter1); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura
+		*/
+		
 						
 		/****************************************************************************
 		* Aqui arrancamos los filtros. En realidad,... es  un poco aburrido.
