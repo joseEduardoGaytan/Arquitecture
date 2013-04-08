@@ -21,11 +21,11 @@ public class Plumber {
 		* Aqui instanciamos los filtros
 		****************************************************************************/
 
-		SourceFilter filter1 = new SourceFilter();
+		SourceFilter filter1 = new SourceFilter("FlightData.dat");
 		FarenheitToCelsiusFilter tempFilter = new FarenheitToCelsiusFilter();
 		FeetToMetersFilter altFilter = new FeetToMetersFilter();
 		SinkFileFilter sinkFilter = new SinkFileFilter();
-		SinkFile2Filter sinkFilter2 = new SinkFile2Filter();
+		SinkExtremeValuesFilter extremeValues = new SinkExtremeValuesFilter();
 
 
 		/****************************************************************************
@@ -35,7 +35,7 @@ public class Plumber {
 		****************************************************************************/
 
 		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
-		sinkFilter2.Connect(altFilter); //conectar el puerto de entrada del Sink2 a la salida del Filtro de altitud
+		extremeValues.Connect(altFilter); //conectar el puerto de entrada del Sink2 a la salida del Filtro de altitud
 		altFilter.Connect(tempFilter); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
 		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
 				
@@ -47,7 +47,7 @@ public class Plumber {
 		tempFilter.start();
 		altFilter.start();
 		sinkFilter.start();
-		sinkFilter2.start();
+		extremeValues.start();
 
 	}
 

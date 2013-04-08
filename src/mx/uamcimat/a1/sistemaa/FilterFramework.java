@@ -1,5 +1,6 @@
 package mx.uamcimat.a1.sistemaa;
 
+
 /******************************************************************************************************************
 * File:FilterFramework.java
 * Course: 17655
@@ -7,56 +8,78 @@ package mx.uamcimat.a1.sistemaa;
 * Copyright: Copyright (c) 2003 Carnegie Mellon University
 * Versions:
 *	1.0 November 2008 - Initial rewrite of original assignment 1 (ajl).
+*	2.0 Marzo 2013 - Equipo Zac Cimat A.C. 
 *
-* Description:
+* Descripcion:
 *
-* This superclass defines a skeletal filter framework that defines a filter in terms of the input and output
-* ports. All filters must be defined in terms of this framework - that is, filters must extend this class
-* in order to be considered valid system filters. Filters as standalone threads until the inputport no longer
-* has any data - at which point the filter finishes up any work it has to do and then terminates.
+* Esta clase de base define el esqueleto de un framework de filtros que define un filtro en termino de 
+* puertos de entrada y salida. Todos los filtros deben ser definidos en base a este framework, esto es que
+* los filtros deben extender esta clase para ser considerados como filtros validos del sistema. Los filtros
+* se ejecutan en hilos individuales hasta que el puerto de entrada (inputport) ya no tiene datos - en ese
+* momento el filtro termina cualquier trabajo pendiente y termina.
+* 
+* 
 *
-* Parameters:
+* Atributos:
 *
-* InputReadPort:	This is the filter's input port. Essentially this port is connected to another filter's piped
-*					output steam. All filters connect to other filters by connecting their input ports to other
-*					filter's output ports. This is handled by the Connect() method.
+* InputReadPort:	Esta es una coleccion HashMap "Key, Value".
+* 					Donde:
+* 					Key es la referencia al fitro predecesor del cual se obtienen datos.
+* 					Value es el puerto de entrada que utiliza el fitro para recibir datos.
+* 					Este puerto se conecta al puerto de salida de otro filtro.
+* 					Todos los filtros se conectan a otros filtros mediante conexiones de los puertos de entrada a los
+* 					puertos de salida de los otros filtros. Esto es manejado por el metodo Connect()
 *
-* OutputWritePort:	This the filter's output port. Essentially the filter's job is to read data from the input port,
-*					perform some operation on the data, then write the transformed data on the output port.
+* OutputWritePort:	Esta es una coleccion HashMap "Key, Value".
+* 					Donde:
+* 					Key es la referencia al fitro sucesor al cual se le envian los datos.
+* 					Value es el puerto de salida que utiliza el fitro para mandar datos.
+* 					Este es un puerto de salida del filtro. En esencia, el trabajo del filtro es de leer data del puerto
+* 					de entrada, realizar alguna operacion sobre los datos, y escribir los datos transformados al puerto
+* 					de salida.	
+* 
+* InputFilter:		Este es un ArratList que contiene la referencia de los filtros que esta conectado a algún puerto de entrada. Esta referencia sirve para
+* 					determinar cuando termina de enviar datos el filtro conectado al puerto de entrada.
 *
-* FilterFramework:  This is a reference to the filter that is connected to the instance filter's input port. This
-*					reference is to determine when the upstream filter has stopped sending data along the pipe.
-*
-* Internal Methods:
+* Metodos:
 *
 *	public void Connect( FilterFramework Filter )
-*	public byte ReadFilterInputPort()
-*	public void WriteFilterOutputPort(byte datum)
-*	public boolean EndOfInputStream()
-*
-*Posteriormente se agregaron estos métodos, utilizados por FarenheitToCelsius y FeetToMeters, se utilizaba el mismo código fuente:
-*
-*	public void sendIDToOutput(int id, int IdLength, byte databyte)
-*	public void sendMeasurementToOutput(long measurement, int MeasurementLength, byte databyte)
+*	protected byte ReadFilterInputPort()
+*	protected void WriteFilterOutputPort(byte datum)
+*	protected boolean EndOfInputStream()
+*	sendIDToOutput(int id, int IdLength, byte databyte)
+*	sendMeasurementToOutput(long measurement, int MeasurementLength, byte databyte)
 *
 ******************************************************************************************************************/
 
 import java.io.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+//import PruebaFork.FilterFramework;
 
 public class FilterFramework extends Thread
 {
-	// Define filter input and output ports
+		/*
+		 * Se definen los HashMap que contendran los filtros predecesores y sucerores 
+		 * a si como su respectivo puerto de entrada o salida
+		 */
 
-	private PipedInputStream InputReadPort = new PipedInputStream();
-	private PipedOutputStream OutputWritePort = new PipedOutputStream();
-
-	// The following reference to a filter is used because java pipes are able to reliably
-	// detect broken pipes on the input port of the filter. This variable will point to
-	// the previous filter in the network and when it dies, we know that it has closed its
-	// output pipe and will send no more data.
-
-	private FilterFramework InputFilter;
-
+		private HashMap<FilterFramework, PipedInputStream> InputReadPorts = new HashMap<FilterFramework, PipedInputStream>();
+		private HashMap<FilterFramework, PipedOutputStream> OutputWritePorts = new HashMap<FilterFramework, PipedOutputStream>();
+		
+		
+		// The following reference to a filter is used because java pipes are able to reliably
+		// detect broken pipes on the input port of the filter. This variable will point to
+		// the previous filter in the network and when it dies, we know that it has closed its
+		// output pipe and will send no more data.
+		// se creo un arreglo de Filtros que contiene la referencia a otros filtros para determinar
+		// si se a terminado de enviar datos.
+		private ArrayList<FilterFramework> InputFilters = new ArrayList<FilterFramework>();
+		
 	/***************************************************************************
 	* InnerClass:: EndOfStreamExeception
 	* Purpose: This
@@ -95,14 +118,42 @@ public class FilterFramework extends Thread
 	*
 	****************************************************************************/
 
-	public void Connect( FilterFramework Filter )
+	public void Connect( FilterFramework Filter)
 	{
 		try
 		{
 			// Connect this filter's input to the upstream pipe's output stream
-
-			InputReadPort.connect( Filter.OutputWritePort );
-			InputFilter = Filter;
+			/*
+			 * se crean un PipedInputStream que sera el puerto de entrada al filtro
+			 * que se esta conectando.
+			 */
+			
+			PipedInputStream in = new PipedInputStream();
+			
+			/*
+			 * se crean un PipedOutputStream que sera el puerto de salida al filtro
+			 * que se esta conectando.
+			 */
+			PipedOutputStream out = new PipedOutputStream();
+			
+			
+			/*
+			 * se agrega el filtro al arreglo de filtros para posteriormente
+			 * verificar si a terminado de enviar datos
+			 */
+			InputFilters.add(Filter);
+			
+			
+			//se obtiene el indice en el cual fue agregado el filtro al arreglo
+			int index = InputFilters.indexOf(Filter);
+			
+			//se agrega el puerto de salida y el filtro al que pertenece en el OutputWritePorts  
+			InputFilters.get(index).OutputWritePorts.put(this, out);
+			
+			//se agrega el puerto de entrada y el filtro al que pertenece en el InputReadPorts 
+			InputReadPorts.put(Filter, in);
+			// Conecta la entrada de este filtro a la salida del filtro previo
+			InputReadPorts.get(Filter).connect(InputFilters.get(index).OutputWritePorts.get(this));
 
 		} // try
 
@@ -118,7 +169,9 @@ public class FilterFramework extends Thread
 	* CONCRETE METHOD:: ReadFilterInputPort
 	* Purpose: This method reads data from the input port one byte at a time.
 	*
-	* Arguments: void
+	* Arguments: 
+	* 	index - este indica la posicion del filtro el el arreglo InputFilters
+	* 			de donde se obtienen los datos
 	*
 	* Returns: byte of data read from the input port of the filter.
 	*
@@ -126,9 +179,16 @@ public class FilterFramework extends Thread
 	*
 	****************************************************************************/
 
-	protected byte ReadFilterInputPort() throws EndOfStreamException
+	protected byte ReadFilterInputPort(int index) throws EndOfStreamException
 	{
 		byte datum = 0;
+		/*
+		 * con el parametro index se obtiene el filtro del cual se desea obtener datos
+		 * despues de conocer el filtro se obtiene el puerto de entrada utilizado por dicho filtro 
+		 */
+		FilterFramework input = InputFilters.get(index);
+		PipedInputStream InputReadPort = InputReadPorts.get(input);
+		
 
 		/***********************************************************************
 		* Since delays are possible on upstream filters, we first wait until
@@ -146,10 +206,11 @@ public class FilterFramework extends Thread
 
 		try
 		{
-			while (InputReadPort.available()==0 )
+			
+			while(InputReadPort.available() == 0)
 			{
-				if (EndOfInputStream())
-				{
+				if ( EndOfInputStream(input) )
+				{					
 					throw new EndOfStreamException("End of input stream reached");
 
 				} //if
@@ -157,6 +218,8 @@ public class FilterFramework extends Thread
 				sleep(250);
 
 			} // while
+			//}
+			
 
 		} // try
 
@@ -179,8 +242,10 @@ public class FilterFramework extends Thread
 
 		try
 		{
-			datum = (byte)InputReadPort.read();
-			return datum;
+			//PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
+			
+			datum = (byte)InputReadPort.read();			
+			return datum;			
 
 		} // try
 
@@ -196,7 +261,7 @@ public class FilterFramework extends Thread
 	/***************************************************************************
 	* CONCRETE METHOD:: WriteFilterOutputPort
 	* Purpose: This method writes data to the output port one byte at a time.
-	*
+	*			Este metodo escribe datos a todos los puertos de salida un byte a la vez.
 	* Arguments:
 	* 	byte datum - This is the byte that will be written on the output port.of
 	*	the filter.
@@ -211,9 +276,15 @@ public class FilterFramework extends Thread
 	{
 		try
 		{
-            OutputWritePort.write((int) datum );
-		   	OutputWritePort.flush();
-
+			/*
+			 * se crea un ciclo for que recora el OutputWritePorts para enviar los datos a todos los filtros conectados 
+			 */
+			for(Entry<FilterFramework, PipedOutputStream> entry : OutputWritePorts.entrySet())
+			{
+				entry.getValue().write((int) datum);
+				entry.getValue().flush();				
+			}
+			
 		} // try
 
 		catch( Exception Error )
@@ -234,7 +305,8 @@ public class FilterFramework extends Thread
 	* is still alive. This is done because Java does not reliably handle broken
 	* input pipes and will often continue to read (junk) from a broken input pipe.
 	*
-	* Arguments: void
+	* Arguments: 
+	* 		InputFilter - recibe la referencia de algun Filtro predecesor
 	*
 	* Returns: A value of true if the previous filter has stopped sending data,
 	*		   false if it is still alive and sending data.
@@ -243,17 +315,15 @@ public class FilterFramework extends Thread
 	*
 	****************************************************************************/
 
-	private boolean EndOfInputStream()
+	private boolean EndOfInputStream(FilterFramework InputFilter)
 	{
+
 		if (InputFilter.isAlive())
 		{
 			return false;
-
-		} else {
-			
-			return true;
-
-		} // if
+		}			
+	
+		return true;
 
 	} // EndOfInputStream
 
@@ -275,8 +345,24 @@ public class FilterFramework extends Thread
 	{
 		try
 		{
+			/*
+			 * se crea un ciclo for que recora el OutputWritePorts para cerrar todos los puertos de salida 
+			 */
+			for(Entry<FilterFramework, PipedOutputStream> entry : OutputWritePorts.entrySet())
+			{
+				entry.getValue().close();				
+			}
+			
+			/*
+			 * se crea un ciclo for que recora el InputReadPorts para cerrar todos los puertos de entrada 
+			 */
+			for(PipedInputStream InputReadPort: InputReadPorts.values())
+			{			
 			InputReadPort.close();
+			}
+			/*
 			OutputWritePort.close();
+			*/
 
 		}
 		catch( Exception Error )

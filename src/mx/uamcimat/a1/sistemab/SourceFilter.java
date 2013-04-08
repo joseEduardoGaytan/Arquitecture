@@ -1,16 +1,25 @@
 package mx.uamcimat.a1.sistemab;
 /******************************************************************************************************************
 * File:SourceFilter.java
-* Course: 17655
-* Project: Assignment 1
-* Copyright: Copyright (c) 2003 Carnegie Mellon University
+* Project: Assignment 1,
+* Copyright: Equipo Zac
 * Versions:
-*	1.0 November 2008 - Sample Pipe and Filter code (ajl).
+*	1.0 Marzo 2013.
 *
 * Descripcion:
+* Esta clase hereda de la superclase FilterFramework.
+* Esta clase sirve para crear un filtro fuente. Este filtro particular es un filtro fuente que lee datos de un
+* archivo y escribe los datos en el flujo.
 *
-* Esta clase sirve como ejemplo de como usar el SourceFilterTemplate para crear un filtro fuente. Este filtro
-* particular es un filtro fuente que lee entrada del archivo FlightData.dat y escribe los datos en el flujo.
+* Atributos:
+* 	fileName:							Este el nombre del archivo que contiene los datos. Este recibe el nombre
+* 										del archivo por medio del constructor SourceFilter(String file).
+* Costructores:
+* 	public SourceFilter(String file):	Este costructor recibe como parametros un dato de tipo String donde 
+* 										se indican el nombre del archivo que contiene los datos.
+* Metodos:
+*	public void run():					Es el ciclo principal de lectura-escritura para leer datos de 
+*										alguna fuente y escribir al puerto de salida del filtro.
 ******************************************************************************************************************/
 
 import java.io.BufferedReader;
@@ -21,10 +30,22 @@ import java.io.IOException;
 
 public class SourceFilter extends FilterFramework
 {
+	
+	String fileName;	// Archivo de datos de entrada.
+	
+	/*
+	 * Este contructor recibe como parametro el nombre del archivo y lo almacena
+	 * en el atributo fileName
+	 */
+	public SourceFilter(String file)
+	{
+		fileName = file;
+	}
+	
 	public void run()
     {
 
-		String fileName = "FlightData.dat";	// Archivo de datos de entrada.
+		
 		int bytesread = 0;										// Bytes leidos del archivo de entrada.
 		int byteswritten = 0;									// Bytes escritos al flujo.
 		DataInputStream in = null;								// Referencia al flujo del archivo.

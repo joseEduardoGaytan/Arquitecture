@@ -151,9 +151,9 @@ public class SinkAltPressionFilter extends FilterFramework {
 	
 					if ( id == 0 )
 					{
-						//TimeStamp.setTimeInMillis(measurement);
+						//se almacena el dato de tiempo en la instancia del objeto Datos
 						datos.setTiempo(measurement);
-						//archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
+						
 	
 					} // if
 	
@@ -168,6 +168,7 @@ public class SinkAltPressionFilter extends FilterFramework {
 	
 					if (id == 2)
 					{
+						//se almacena el dato de altitud en la instancia del objeto Datos
 						datos.setAltitud(Double.longBitsToDouble(measurement));
 					}
 					
@@ -182,6 +183,7 @@ public class SinkAltPressionFilter extends FilterFramework {
 					
 					if ( id == 3 )
 					{
+						//se almacena el dato de presion en la instancia del objeto Datos
 						datos.setPresion(Double.longBitsToDouble(measurement));	
 					} // if
 					
@@ -198,7 +200,18 @@ public class SinkAltPressionFilter extends FilterFramework {
 					
 					if ( id == 4 )
 					{
+						//se almacena el dato de Temperatura en la instancia del objeto Datos
 						datos.setTemperatura((Double.longBitsToDouble(measurement)));	
+						
+						/*
+						 * Se realiza las validaciones para determinar si  los valores optenidos son validos.
+						 * si un valor extremo es encontrado al princio del flujo de datos, se almacena en la
+						 * lista ligada hasta que aparesca un valor valido, despues se remplazan los valores extremos
+						 * por el valor valido y se guarda el valor valido en  ultimoValorPresion.
+						 * si un valor extremo es encontrontrado al final del flujo de datos se
+						 * se almacena en la lista ligada para un uso posterior. si los valores extremos son encontrados
+						 * entre dos valores validos, se remplaza por el promedio de estos valores. 
+						 */
 						if (datos.getPresion() > 90 || datos.getPresion() < 45) {
 							list.add(datos);
 						}//if
@@ -261,6 +274,11 @@ public class SinkAltPressionFilter extends FilterFramework {
 				} // catch
 	
 			} // while
+			/*
+			 * en esta parte se verifica si la lista contiene algun dato, de ser asi quiere decir que no existe
+			 * un valor valido de presion y por lo tanto todos los datos de seran remplazados por el utimo valor
+			 * valido de presion   
+			 */
 			if (!list.isEmpty()){
 				for (Datos d : list) {
 					TimeStamp.setTimeInMillis(d.getTiempo());

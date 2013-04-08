@@ -2,7 +2,7 @@ package mx.uamcimat.a1.sistemac;
 
 /******************************************************************************************************************
 * File:FarenheitToCelsiusFilter.java
-* Project: Assignment 1, Sistem A
+* Project: Assignment 1,
 * Copyright: Equipo Zac
 * Versions:
 *	1.0 Marzo 2013.
@@ -10,8 +10,14 @@ package mx.uamcimat.a1.sistemac;
 * Description:
 *
 * Esta clase hereda de la superclase FilterFramework.
-* Se Filtran unicamente los datos que se vana a requerir, como lo es el tiempo, la altitud y
-* además se hace la conversión de la temperatura de Farenheit a grados Celsius.
+* Esta clase realiza la conversión de temperatura de grados Farenheit a Celsius, Ademas de trasmitir los datos
+* transformados y los demas datos al siguiente filtro 
+* 
+* Atributos:
+* Costructores:
+* Metodos:
+*	public void run():					Es el ciclo principal de lectura-escritura para leer datos de 
+*										alguna fuente y escribir al puerto de salida del filtro.
 *
 *
 ******************************************************************************************************************/
@@ -96,34 +102,25 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 
 				} // if
 				
-				/**********************************************************************************
-				 * Se compara cuando el id = 0 o 2, si no se hace la comparación 
-				 * con el fin de pasarlo a la salida del siguiente filtro. Sin esta comparación 
-				 * los otros datos no son pasados al siguiente filtro.
-				 ***********************************************************************************/				
-								
-				//if ( id ==0 || id == 2)
-				//{
-					
-				//}
-				
 				/**
-				 * Se hace la comparación con 4, ya que se trata del Id de la temperatura, se hace la conversión a grados Celcius
+				 * Se hace la comparación con 4, ya que se trata del Id de la temperatura,
+				 * se hace la conversión a grados Celcius
 				 */
 				
 				if ( id == 4 )
 				{
 					temperature = Double.longBitsToDouble(measurement); //Almacenar el valor de measurment a double
-					celsius = (temperature - 32) * (5.0 / 9);			//Celsius para guardar la conversión, se utiliza el 5.0 pues sino la operación se redondea a entero
+					celsius = (temperature - 32) * (5.0 / 9);			//Celsius para guardar la conversión, se utiliza 
+																		//el 5.0 pues sino la operación se redondea a entero
 					measurement = Double.doubleToLongBits(celsius);		//Para tratarlo como long
 										
 				} // if
 				
-				sendIDToOutput(id, IdLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
+				sendIDToOutput(id, IdLength, databyte);			//Se envían los datos al puerto de salida.
 				byteswritten += IdLength;						//Los bytes escritos es igual a la longitud del ID
 				
-				sendMeasurementToOutput(measurement, MeasurementLength, databyte); //Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
-				byteswritten += MeasurementLength;				//Los bytes escritos es igual a la longitud de Measurement
+				sendMeasurementToOutput(measurement, MeasurementLength, databyte); 	//Se envían los datos al puerto de salida
+				byteswritten += MeasurementLength;					//Los bytes escritos es igual a la longitud de Measurement
 				
 			}catch(EndOfStreamException e){
 				ClosePorts();

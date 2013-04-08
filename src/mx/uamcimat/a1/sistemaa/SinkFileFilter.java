@@ -2,19 +2,23 @@ package mx.uamcimat.a1.sistemaa;
 
 /******************************************************************************************************************
 * File:SinkFileFilter.java
-* Project: Assignment 1, Sistem A
+* Project: Assignment 1,
 * Copyright: Equipo Zac
 * Versions:
-*	1.0 November 2013.
+*	1.0 Marzo 2013.
 *
 * Description:
 *
-* Esta clase sirve como ejemplo para usar el SinkFilterTemplate para crear un filtro pozo. Este filtro particular
+* Esta clase es un filtro pozo. Este filtro particular
 * lee una entrada del puerto de entrada del filtro y hace lo siguiente:
 * 
 * 1) Obtiene los datos desde el FeetToMeterFilter
 * 2) Ya con los datos con las conversiones se dispone a construir una cadena, para estructurar la información
-* 3) Una vez la información a sido estructurada se abre un archivo y se almacena la cadena. 
+* 3) La informacion es escrita en el archivo cada vez que se cuenta con los siguietnes datos:
+* 	Tiempo
+*	Temperatura
+*	Altitud
+* 
 *
 ******************************************************************************************************************/
 
@@ -86,7 +90,7 @@ public class SinkFileFilter extends FilterFramework {
 
 				for (i=0; i<IdLength; i++ )
 				{
-					databyte = ReadFilterInputPort();	// Aqui leemos el byte del flujo	
+					databyte = ReadFilterInputPort(0);	// Aqui leemos el byte del flujo	
 
 					id = id | (databyte & 0xFF);		// Adjuntamos el byte al ID
 
@@ -116,7 +120,7 @@ public class SinkFileFilter extends FilterFramework {
 
 				for (i=0; i<MeasurementLength; i++ )
 				{
-					databyte = ReadFilterInputPort();
+					databyte = ReadFilterInputPort(0);
 					measurement = measurement | (databyte & 0xFF);	// Adjuntamos el byte a la medicion...
 
 					if (i != MeasurementLength-1)					// Si este no es el ultimo byte, recorremos el byte

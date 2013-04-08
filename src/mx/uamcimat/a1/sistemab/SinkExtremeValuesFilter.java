@@ -28,7 +28,7 @@ import java.text.*;
 import mx.uamcimat.a1.sistemab.FilterFramework.EndOfStreamException;
 
 
-public class SinkFile2Filter extends FilterFramework {
+public class SinkExtremeValuesFilter extends FilterFramework {
 
 	public void run()
     {

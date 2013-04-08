@@ -62,7 +62,7 @@ public class SinkInclPressionFilter extends FilterFramework {
 		FileWriter archivo = null;							//El archivo de salida, aquí solamente se declara como FileWriter
 		/*
 		 * se utilizara una lista ligada para almacenar los datos hasta que un valor
-		 * de la precsión sea valido para cambiar los valores extremos, ademas se utlizará 
+		 * de la presión sea valido para cambiar los valores extremos, ademas se utlizará 
 		 * una clase llamada Datos,  la cual tiene la estructura de los datos  
 		 */
 		Datos datos = new Datos();
@@ -153,10 +153,9 @@ public class SinkInclPressionFilter extends FilterFramework {
 	
 					if ( id == 0 )
 					{
-						//TimeStamp.setTimeInMillis(measurement);
+						//se almacena el dato de tiempo en la instancia del objeto Datos
 						datos.setTiempo(measurement);
-						//archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
-	
+						
 					} // if
 	
 					/****************************************************************************
@@ -170,6 +169,7 @@ public class SinkInclPressionFilter extends FilterFramework {
 	
 					if (id == 2)
 					{
+						//se almacena el dato de altitud en la instancia del objeto Datos
 						datos.setAltitud(Double.longBitsToDouble(measurement));
 					}
 					
@@ -184,6 +184,7 @@ public class SinkInclPressionFilter extends FilterFramework {
 					
 					if ( id == 3 )
 					{
+						//se almacena el dato de presion en la instancia del objeto Datos
 						datos.setPresion(Double.longBitsToDouble(measurement));	
 					} // if
 					
@@ -197,6 +198,7 @@ public class SinkInclPressionFilter extends FilterFramework {
 					
 					if ( id == 4)
 					{
+						//se almacena el dato de Temperatura en la instancia del objeto Datos
 						datos.setTemperatura((Double.longBitsToDouble(measurement)));
 						
 					}
@@ -213,9 +215,19 @@ public class SinkInclPressionFilter extends FilterFramework {
 					 ****************************************************************************/
 					
 					if ( id == 5 )
-					{
+					{	
+						//se almacena el dato de Inclinacion en la instancia del objeto Datos
 						datos.setInclinacion((Double.longBitsToDouble(measurement)));
-																		
+									
+						/*
+						 * Se realiza las validaciones para determinar si  los valores optenidos son validos.
+						 * si un valor extremo es encontrado al princio del flujo de datos, se almacena en la
+						 * lista ligada hasta que aparesca un valor valido, despues se remplazan los valores extremos
+						 * por el valor valido y se guarda el valor valido en  ultimoValorPresion o ultimoValorInclinacion
+						 * segun sea el caso. si un valor extremo es encontrontrado al final del flujo de datos se
+						 * se almacena en la lista ligada para un uso posterior. si los valores extremos son encontrados
+						 * entre dos valores validos, se remplaza por el promedio de estos valores. 
+						 */
 						if (datos.getPresion() > 65 || datos.getInclinacion() > 10) {
 							list.add(datos);
 						}//if
@@ -297,6 +309,11 @@ public class SinkInclPressionFilter extends FilterFramework {
 				} // catch
 	
 			} // while
+			/*
+			 * en esta parte se verifica si la lista contiene algun dato, de ser asi quiere decir que no existe
+			 * un valor valido de presion y/o altitud y por lo tanto todos los datos de seran remplazados por el utimo valor
+			 * valido de presion o altitud segun sea el caso  
+			 */
 			if (!list.isEmpty()){
 				for (Datos d : list) {
 					TimeStamp.setTimeInMillis(d.getTiempo());
