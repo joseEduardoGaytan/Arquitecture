@@ -22,8 +22,8 @@ public class Plumber {
 		* Aqui instanciamos los filtros
 		****************************************************************************/
 
-		SourceFilter filter1 = new SourceFilter("SubSetA.dat");
-		SourceFilter filter2 = new SourceFilter("SubSetB.dat");
+		SourceFilter filter1 = new SourceFilter(args[0]);
+		SourceFilter filter2 = new SourceFilter(args[1]);
 		TeePipeFilter jointFilter = new TeePipeFilter();
 		FeetToMetersFilter altFilter = new FeetToMetersFilter();
 		FarenheitToCelsiusFilter tempFilter = new FarenheitToCelsiusFilter();

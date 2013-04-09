@@ -21,7 +21,7 @@ public class Plumber {
 		* Aqui instanciamos los filtros
 		****************************************************************************/
 
-		SourceFilter filter1 = new SourceFilter("FlightData.dat");
+		SourceFilter filter1 = new SourceFilter(args[0]);
 		FarenheitToCelsiusFilter tempFilter = new FarenheitToCelsiusFilter();
 		FeetToMetersFilter altFilter = new FeetToMetersFilter();
 		SinkFileFilter sinkFilter = new SinkFileFilter();
