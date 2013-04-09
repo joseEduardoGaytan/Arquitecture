@@ -28,6 +28,8 @@ import java.util.Calendar;
 import java.io.*;
 import java.text.*;
 
+import mx.uamcimat.a1.sistemab.Datos;
+
 
 public class SinkFileFilter extends FilterFramework {
 
@@ -53,14 +55,13 @@ public class SinkFileFilter extends FilterFramework {
 		int id;							// Este es el id de medicion
 		int i;							// Este es el contador del ciclo
 		
-		double temperature;				//Almacena la temperatura en grados Celsius
-		double altitude = 0;			//Almacena la altitud en metros, se inicializa pues el id 4 es el que determina cuando se debe hacer un salto de línea
-		
 		DecimalFormat formatoTemperatura = new DecimalFormat("###.#####"); 	//Para el formato de la temperatura TTT.ttttt
 		DecimalFormat formatoAltitud = new DecimalFormat("######.#####");	// Para el formato para la altitud AAAAAA.aaaaa
 		
 		FileWriter archivo = null;							//El archivo de salida, aquí solamente se declara como FileWriter
 
+		//se utlizará una clase llamada Datos la cual tiene la estructura de los datos 		
+		Datos datos = new Datos();
 		/*************************************************************
 		*	Primero le anunciamos al mundo que estamos vivos
 		**************************************************************/
@@ -146,10 +147,8 @@ public class SinkFileFilter extends FilterFramework {
 
 				if ( id == 0 )
 				{
-					TimeStamp.setTimeInMillis(measurement);
-					
-					archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t");
-
+					//se almacena el dato de tiempo en la instancia del objeto Datos
+					datos.setTiempo(measurement);
 				} // if
 
 				/****************************************************************************
@@ -163,7 +162,8 @@ public class SinkFileFilter extends FilterFramework {
 
 				if (id == 2)
 				{
-					altitude = Double.longBitsToDouble(measurement);
+					//se almacena el dato de Altidud en la instancia del objeto Datos
+					datos.setAltitud(Double.longBitsToDouble(measurement));
 				}
 				
 				/****************************************************************************
@@ -179,10 +179,13 @@ public class SinkFileFilter extends FilterFramework {
 				
 				if ( id == 4 )
 				{
-					temperature = Double.longBitsToDouble(measurement);
-					
-					archivo.write(formatoTemperatura.format(temperature)+"\t\t"+formatoAltitud.format(altitude)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
-				} // if
+					//se almacena el dato de Temperatura en la instancia del objeto Datos
+					datos.setTemperatura((Double.longBitsToDouble(measurement)));	
+					TimeStamp.setTimeInMillis(datos.getTiempo());
+					archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + 
+							"\t"+formatoTemperatura.format(datos.getTemperatura())+"\t\t"+
+							formatoAltitud.format(datos.getAltitud())+"\r\n"); 
+					} // if
 			
 			} // try
 

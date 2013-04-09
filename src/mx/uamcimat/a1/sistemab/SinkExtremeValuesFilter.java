@@ -52,17 +52,17 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 		int id;							// Este es el id de medicion
 		int i;							// Este es el contador del ciclo
 		
-		double presion = 0;				//Almacena la presion en PSI
-		
 		DecimalFormat formatoPresion = new DecimalFormat("##.#####");	// Para el formato para la Presión PP.ppppp
 		
 		FileWriter archivo = null;							//El archivo de salida, aquí solamente se declara como FileWriter
-
+		
+		//se utlizará una clase llamada Datos la cual tiene la estructura de los datos 
+		Datos datos = new Datos();
 		/*************************************************************
 		*	Primero le anunciamos al mundo que estamos vivos
 		**************************************************************/
 
-		System.out.print( "\n" + this.getName() + "::Sink2 File Reading ");		
+		System.out.print( "\n" + this.getName() + "::SinkExtremeValues File Reading ");		
 				
 		try {
 			archivo = new FileWriter("ExtremeValuesB.txt");
@@ -143,7 +143,8 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 
 				if ( id == 0 )
 				{
-					TimeStamp.setTimeInMillis(measurement);
+					//se almacena el dato de tiempo en la instancia del objeto Datos
+					datos.setTiempo(measurement);
 
 				} // if
 
@@ -159,9 +160,12 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 				
 				if ( id == 3 )
 				{
-					presion = Double.longBitsToDouble(measurement);
-					if (presion > 80 || presion < 50) {
-						archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t"+formatoPresion.format(presion)+"\r\n"); // se concatenan las variables con los valores respectivos y se produce un salto de línea
+					//se almacena el dato de Presion en la instancia del objeto Datos
+					datos.setPresion(Double.longBitsToDouble(measurement));
+					if (datos.getPresion() > 80 || datos.getPresion() < 50) {
+						TimeStamp.setTimeInMillis(datos.getTiempo());
+						archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + "\t"+formatoPresion.format(datos.getPresion())+"\r\n"); 
+						datos = new Datos();
 					}
 					
 				} // if		
@@ -178,7 +182,7 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 			catch (EndOfStreamException | IOException e)
 			{
 				ClosePorts();
-				System.out.print( "\n" + this.getName() + "::Sink2 Exiting; bytes read: " + bytesread );
+				System.out.print( "\n" + this.getName() + "::SinkExtremeValues Exiting; bytes read: " + bytesread );
 				break;
 
 			} // catch
@@ -190,7 +194,7 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 			archivo.close();
 			
 		}catch(IOException e){
-			System.out.print( "\n" + this.getName() + "::Sink2 File Filter Exiting; bytes read: " + bytesread +"; "  );
+			System.out.print( "\n" + this.getName() + "::SinkExtremeValues File Filter Exiting; bytes read: " + bytesread +"; "  );
 		}
 		
 
