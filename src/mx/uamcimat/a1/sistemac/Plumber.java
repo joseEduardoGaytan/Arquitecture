@@ -1,8 +1,5 @@
 package mx.uamcimat.a1.sistemac;
 
-
-//import mx.uamcimat.a1.ejemplo.SourceFilter; // se importa la clase SourceFilter con el fin de no crearla de nueva cuenta
-
 /**
  * Como se modifico la Superclase FilterFramework, es necesario utilizar de nueva cuenta el archivo
  * SourceFilter
@@ -29,53 +26,26 @@ public class Plumber {
 		FarenheitToCelsiusFilter tempFilter = new FarenheitToCelsiusFilter();
 		SinkAltPressionFilter sinkAltPressFilter = new SinkAltPressionFilter();
 		SinkInclPressionFilter sinkInclPressFilter = new SinkInclPressionFilter();
-				
-		//JoinSinkFileFilter joinFilter = new JoinSinkFileFilter();
-
+		
+		
 		/****************************************************************************
-		* Aqui conectamos los filtros empezando con el filtro pozo (filter3) el cual
-		* conectamos al filter2 que es el filtro del medio. Posteriormente conectamos filter2
-		* al filtro fuente (filter1).
+		* Aqui conectamos los filtros empezando con un filtro pozo (sinkInclPressFilter) 
+		* el cual conectamos al tempFilter que es el filtro que hace la conversión a 
+		* grados Celsius. Posteriormente conectamos otro filtro pozo sinkAltPressFilter
+		* con otro puerto de salida del tempFilter, el tempFilter a su vez esta conectado
+		* a altFilter que hace la conversion de datos a metros. El altFilter se conecta con
+		* el filtro encargado de leer dos archivos y alinear los datos (jointFilter),
+		* jointFilter esta conectado a dos filtros fuente: filter1 y filter2
 		****************************************************************************/
 
 		//Para el join
 		
-		sinkInclPressFilter.Connect(tempFilter);
-		sinkAltPressFilter.Connect(tempFilter);
-		tempFilter.Connect(altFilter);
-		altFilter.Connect(jointFilter);	
-		jointFilter.Connect(filter1);
-		jointFilter.Connect(filter2);		
-		
-		/*sinkAltPressFilter.Connect(jointFilter);
-		//tempFilter.Connect(altFilter);
-		//altFilter.Connect(jointFilter);
-		jointFilter.Connect(filter1);
-		jointFilter.Connect(filter2);*/
-		
-		/*joinFilter.Connect(altFilter);
-		joinFilter.Connect(tempFilter);
-		altFilter.Connect(filter1);
-		tempFilter.Connect(filter1);*/	
-		
-		//Para el sequential
-		/*sinkFilter.Connect(tempFilter);
-		tempFilter.Connect(altFilter);
-		altFilter.Connect(filter1);*/
-		
-		//Para el Fork
-		/*sinkFilter2.Connect(tempFilter);
-		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
-		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
-		altFilter.Connect(filter1);*/ //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
-		
-		
-		/*sinkFilter2.Connect(tempFilter);
-		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
-		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
-		altFilter.Connect(filter1); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura
-		*/
-		
+		sinkInclPressFilter.Connect(tempFilter);	//Conectar uno de los filtros de entrada de un filtro pozo a una de las salidas del altFilter
+		sinkAltPressFilter.Connect(tempFilter);		//Conectar uno de los filtros de entrada de un filtro pozo a una de las salidas del altFilter
+		tempFilter.Connect(altFilter);				//Conectar uno de los filtros de entrada del tempFilter a la salida del altFilter 
+		altFilter.Connect(jointFilter);				//Conectar uno de los filtros de entrada del altFilter a la salida del jointFilter
+		jointFilter.Connect(filter1);				//Conectar uno de los filtros de entrada del jointFilter a la salida de un filtro fuente
+		jointFilter.Connect(filter2);				//Conectar uno de los filtros de entrada del jointFilter a la salida de un filtro fuente 	
 						
 		/****************************************************************************
 		* Aqui arrancamos los filtros. En realidad,... es  un poco aburrido.
@@ -88,13 +58,7 @@ public class Plumber {
 		tempFilter.start();
 		sinkAltPressFilter.start();
 		sinkInclPressFilter.start();
-		/*altFilter.start();
-		tempFilter.start();		
-		joinFilter.start();*/
-		//sinkFilter.start();
-		//sinkFilter2.start();
 		
-
 	}
 
 }

@@ -76,7 +76,7 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 				/****************************************************************************
 				 * Aqui leemos mediciones. Todos los datos de medicion se leen como un flujo de bytes
 				 * y se almacenan como un valor long. Esto nos permite hacer manipulaciones a nivel bit
-				 * que son necesarias para convertir el flujo de bytes en varias palabras da datos. Notese que
+				 * que son necesarias para convertir el flujo de bytes en varias palabras de datos. Notese que
 				 * las manipulaciones de bits no estan permitidas en tipos de punto flotante en java.
 				 * Si el id = 0, entonces este es un valor de tiempo y por ello es un valor long - no
 				 * hay problema. Sin embargo, si el id es algo distinto a cero, entonces los bits

@@ -182,10 +182,12 @@ public class SinkFileFilter extends FilterFramework {
 					//se almacena el dato de Temperatura en la instancia del objeto Datos
 					datos.setTemperatura((Double.longBitsToDouble(measurement)));	
 					TimeStamp.setTimeInMillis(datos.getTiempo());
+					
+					//Se escriben los datos en el archivo de salida
 					archivo.write(TimeStampFormat.format(TimeStamp.getTime()) + 
 							"\t"+formatoTemperatura.format(datos.getTemperatura())+"\t\t"+
 							formatoAltitud.format(datos.getAltitud())+"\r\n"); 
-					} // if
+				} // if
 			
 			} // try
 

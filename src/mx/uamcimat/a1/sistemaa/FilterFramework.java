@@ -59,14 +59,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-//import PruebaFork.FilterFramework;
+
 
 public class FilterFramework extends Thread
 {
-		/*
+		/*****************************************************************************
 		 * Se definen los HashMap que contendran los filtros predecesores y sucerores 
 		 * a si como su respectivo puerto de entrada o salida
-		 */
+		 ******************************************************************************/
 
 		private HashMap<FilterFramework, PipedInputStream> InputReadPorts = new HashMap<FilterFramework, PipedInputStream>();
 		private HashMap<FilterFramework, PipedOutputStream> OutputWritePorts = new HashMap<FilterFramework, PipedOutputStream>();
@@ -218,7 +218,7 @@ public class FilterFramework extends Thread
 				sleep(250);
 
 			} // while
-			//}
+			
 			
 
 		} // try
@@ -242,8 +242,7 @@ public class FilterFramework extends Thread
 
 		try
 		{
-			//PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
-			
+						
 			datum = (byte)InputReadPort.read();			
 			return datum;			
 
@@ -360,10 +359,7 @@ public class FilterFramework extends Thread
 			{			
 			InputReadPort.close();
 			}
-			/*
-			OutputWritePort.close();
-			*/
-
+			
 		}
 		catch( Exception Error )
 		{

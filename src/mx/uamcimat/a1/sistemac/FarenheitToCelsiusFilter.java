@@ -102,10 +102,10 @@ public class FarenheitToCelsiusFilter extends FilterFramework {
 
 				} // if
 				
-				/**
+				/*************************************************************************
 				 * Se hace la comparación con 4, ya que se trata del Id de la temperatura,
 				 * se hace la conversión a grados Celcius
-				 */
+				 *************************************************************************/
 				
 				if ( id == 4 )
 				{

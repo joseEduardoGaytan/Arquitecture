@@ -100,10 +100,10 @@ public void run(){
 
 				} // if
 				
-				/**
+				/***********************************************************************
 				 * Se hace la comparación con 2, ya que se trata del Id de la Altitud,
 				 * se hace la conversión a Metros
-				 */
+				 ***********************************************************************/
 				
 				if ( id == 2 )
 				{

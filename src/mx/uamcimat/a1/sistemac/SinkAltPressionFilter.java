@@ -204,7 +204,7 @@ public class SinkAltPressionFilter extends FilterFramework {
 						datos.setTemperatura((Double.longBitsToDouble(measurement)));	
 						
 						/*
-						 * Se realiza las validaciones para determinar si  los valores optenidos son validos.
+						 * Se realiza las validaciones para determinar si  los valores obtenidos son validos.
 						 * si un valor extremo es encontrado al princio del flujo de datos, se almacena en la
 						 * lista ligada hasta que aparesca un valor valido, despues se remplazan los valores extremos
 						 * por el valor valido y se guarda el valor valido en  ultimoValorPresion.

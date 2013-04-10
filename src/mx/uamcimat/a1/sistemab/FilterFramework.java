@@ -59,7 +59,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-//import PruebaFork.FilterFramework;
 
 public class FilterFramework extends Thread
 {
@@ -218,9 +217,7 @@ public class FilterFramework extends Thread
 				sleep(250);
 
 			} // while
-			//}
 			
-
 		} // try
 
 		catch( EndOfStreamException Error )
@@ -242,7 +239,6 @@ public class FilterFramework extends Thread
 
 		try
 		{
-			//PipedInputStream InputReadPort = InputReadPorts.get(InputFilters.get(index));
 			
 			datum = (byte)InputReadPort.read();			
 			return datum;			
@@ -360,10 +356,7 @@ public class FilterFramework extends Thread
 			{			
 			InputReadPort.close();
 			}
-			/*
-			OutputWritePort.close();
-			*/
-
+			
 		}
 		catch( Exception Error )
 		{

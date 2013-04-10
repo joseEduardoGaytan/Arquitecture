@@ -1,5 +1,21 @@
 package mx.uamcimat.a1.sistemac;
 
+/******************************************************************************************************************
+* File:TeePipeFilter.java
+* Project: Assignment 1, Sistem C
+* Copyright: Equipo Zac
+* Versions:
+*	1.0 November 2013.
+*
+* Description:
+*
+* Esta clase sirve para la lectura de dos puertos de entrada
+* 
+* 
+*
+******************************************************************************************************************/
+
+
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -23,10 +39,8 @@ public class TeePipeFilter extends FilterFramework {
 		
 		boolean isReady = false;		//Con el fin de verificar si los datos ya pueden ser enviados al output
 		
-		int [] ids = new int[2];
-		long[] measurements = new long[2];
-		
-		int count = 0;
+		int [] ids = new int[2];			//se almacenan los ids de cada puerto de entrada, en este caso 2 puertos de entrada
+		long[] measurements = new long[2];	//se almacenan las medidas de cada puerto de entrada, en este caso 2 puertos de entrada
 		
 		boolean portsClosed = false;	//para verificar si todos los puertos estan inactivos o ya rotos
 				
@@ -96,22 +110,27 @@ public class TeePipeFilter extends FilterFramework {
 		
 						} // for
 					
-					}catch(EndOfStreamException e){ 					//Se atrapa un EndOfStreamException, señal que un puerto de entrada esta roto, pero no necesariamente los otros puertos de entrada están rotos
+						/**********************************************************************
+						 * Se atrapa un EndOfStreamException, señal que un puerto de entrada 
+						 * esta roto, pero no necesariamente los otros puertos de entrada 
+						 * están rotos
+						***********************************************************************/
+					}catch(EndOfStreamException e){ 								
 						measurements[portNumber] = Double.doubleToLongBits(100000);	//Con esto la medida del puerto que esta leyendo se hace una cantidad enorme, haciendo que con las comparaciónes ya no se vuelva a tomar ese puerto
 						
-						portsClosed = true;		//Se ha cerrado un puerto y con el fin de que se haga la evaluación en el siguiente for
+						portsClosed = true;											//Se ha cerrado un puerto y con el fin de que se haga la evaluación en el siguiente for
 						
 						for(i = 0; i < measurements.length; i++)
 							portsClosed = portsClosed && (measurements[i] == Double.doubleToLongBits(100000));	// primer pipe roto =>	true && true && false = false, segundo pipe roto => true && true && true = true 
 						
-						if(portsClosed)			//Si todos los puertos están cerrados se manda otra excepción al try principal para que cierre los puertos y finalice el thread
+						if(portsClosed)												//Si todos los puertos están cerrados se manda otra excepción al try principal para que cierre los puertos y finalice el thread
 							throw new EndOfStreamException("End of input stream reached");
 						
 					}//catch
 				
-				if(!isReady && bytesread > 23) //Se emplea la variable isReady con el fin de saber si los datos están listos para escritura en el output port y bytesread es para saber que ya el arreglo measurement[1] tiene datos  
+				if(!isReady && bytesread > 23) 				//Se emplea la variable isReady con el fin de saber si los datos están listos para escritura en el output port y bytesread es para saber que ya el arreglo measurement[1] tiene datos  
 				{
-					if(measurements[0] < measurements[1]) //se hacen comparaciones, si el puerto 0 es menor que el primero los datos van a ser leídos desde el puerto 0, las medidas son las de tiempo
+					if(measurements[0] < measurements[1]) 	//se hacen comparaciones, si el puerto 0 es menor que el primero los datos van a ser leídos desde el puerto 0, las medidas son las de tiempo, esta comparación es solamente para 2 puertos de entrada
 					{
 						portNumber = 0;					  //se van a seguir leyendo los datos restantes de la entrada desde el puerto 0	
 						isReady = true;						// Para mandar escribir directamente y no tener que pasar por las comparaciones, pues solamente es necesario comparar con el tiempo
@@ -123,23 +142,13 @@ public class TeePipeFilter extends FilterFramework {
 					}
 				}
 				else if(!isReady && bytesread < 23)
-					portNumber = 1;									//para que lea del siguiente puerto, pues solamente es en etapa temprana y solo hay datos leidos desde un puerto
+					portNumber = 1;						//para que lea del siguiente puerto, pues solamente es en etapa temprana y solo hay datos leidos desde un puerto
 				
-				id = ids[portNumber];
-				measurement = measurements[portNumber];
-				
-				/**********************************************************************************
-				 * Se compara cuando el id = 0 o 2, si no se hace la comparación 
-				 * con el fin de pasarlo a la salida del siguiente filtro. Sin esta comparación 
-				 * los otros datos no son pasados al siguiente filtro.
-				 ***********************************************************************************/				
-				
-				//if ( id ==0 || id == 2 || id == 3 || id == 5)
-				//{
+				id = ids[portNumber];					//el id de los datos que resultaron ser menores se almacena para posteriormente enviarlo a las salidas
+				measurement = measurements[portNumber]; //la medida de los datos que resultaron ser menores se almacena para posteriormente enviarlo a las salidas
+								
 				if(isReady)	//los datos han sido comparados y deben enviarse al output
 				{
-					
-					
 					
 					sendIDToOutput(id, IdLength, databyte);	//Se envían los datos al puert de salida.Se manda la referencia de este objeto, con el fin de hacer un delegado de la función WriteToOutputPort
 					byteswritten += IdLength;						//Los bytes escritos es igual a la longitud del ID
@@ -149,23 +158,12 @@ public class TeePipeFilter extends FilterFramework {
 					
 					if(id == 5)
 					{
-						count ++;
-						
-						//portNumber = (portNumber == 0)? 1 : 0; 		// leer desde el puerto de entrada, si portNumber = 0, cambia a 1 de manera contraria es = 0
+												
 						isReady = false;	//se ha llegado al fin de todos los datos, ahora es necesario comparar el tiempo y no escribirlo directamente al puerto de salida
-						
-						if(count > 95)							
-							count ++; //para debug
 						
 					}//if
 					
 				}//if	
-				//}
-				
-				/**
-				 * Se hace la comparación con 4, ya que se trata del Id de la temperatura, se hace la conversión a grados Celcius
-				 */			
-				
 				
 			}catch(EndOfStreamException e){
 				ClosePorts();

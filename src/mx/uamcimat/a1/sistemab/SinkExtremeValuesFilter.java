@@ -148,7 +148,6 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 
 				} // if
 
-			
 				/****************************************************************************
 				 * Aqui tomamos una medicion (ID = 3 en este caso), pero se puede tomar cualquier
 				 * medicion que se quiera. Todas las mediciones en el flujo son recuperadas
@@ -171,7 +170,6 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 				} // if		
 			
 			} // try
-
 
 			/*******************************************************************************			 * 
 			 *  La excepcion EndOfStreamExeception abajo es enviada cuando se alcanza el
@@ -197,7 +195,6 @@ public class SinkExtremeValuesFilter extends FilterFramework {
 			System.out.print( "\n" + this.getName() + "::SinkExtremeValues File Filter Exiting; bytes read: " + bytesread +"; "  );
 		}
 		
-
    } // run
 	
 }

@@ -1,7 +1,5 @@
 package mx.uamcimat.a1.sistemaa;
 
-//import mx.uamcimat.a1.ejemplo.SourceFilter; // se importa la clase SourceFilter con el fin de no crearla de nueva cuenta
-
 /**
  * Como se modifico la Superclase FilterFramework, es necesario utilizar de nueva cuenta el archivo
  * SourceFilter
@@ -27,13 +25,15 @@ public class Plumber {
 		SinkFileFilter sinkFilter = new SinkFileFilter();
 
 		/****************************************************************************
-		* Aqui conectamos los filtros empezando con el filtro pozo (filter3) el cual
-		* conectamos al filter2 que es el filtro del medio. Posteriormente conectamos filter2
+		* Aqui conectamos los filtros empezando con el filtro pozo (sinkFilter) el cual
+		* conectamos al altFilter que es el filtro para convertir altitud a metros. 
+		* Posteriormente conectamos altFilter a tempFilter que se encarga de hacer la 
+		* conversión a grados Celsius y este último se conecta
 		* al filtro fuente (filter1).
 		****************************************************************************/
 
-		sinkFilter.Connect(altFilter); //conectar el puerto de entrada del Sink a la salida del Filtro de altitud
-		altFilter.Connect(tempFilter); //Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
+		sinkFilter.Connect(altFilter); 	//conectar el puerto de entrada del Sink a la salida del Filtro de altitud
+		altFilter.Connect(tempFilter); 	//Conectar el puerto de entrada del Filtro de Altura con la salida del Filtro de Temperatura		
 		tempFilter.Connect(filter1); 	//Conectar el puerto de entrada del Filtro de Temp a la salida del Source
 				
 		/****************************************************************************
